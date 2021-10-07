@@ -42,6 +42,13 @@ TWClient >> findWorkerExchanges [
 		  thenCollect: [ :anExchange | '/exchange/' , anExchange name ]
 ]
 
+{ #category : #'as yet unclassified' }
+TWClient >> idleWatchdog [
+
+	((self queueNamed: 'testRequest') messages = 0)
+		ifTrue: [ self sendMissingRequests ] 
+]
+
 { #category : #information }
 TWClient >> informationArrived: aTWInfoResponse [
 
@@ -176,7 +183,7 @@ TWClient >> runTestExecutionError: aTWTestExecutionError [
 	
 	executionErrors add: aTWTestExecutionError.
 	
-	onUpdateBlock ifNotNil: [ UIManager default defer: onUpdateBlock ]
+	onUpdateBlock ifNotNil: [ onUpdateBlock cull: aTWTestExecutionError ]
 ]
 
 { #category : #operations }
@@ -187,7 +194,7 @@ TWClient >> runTestResponse: aTWTestResponse [
 	
 	testResult mergeWith: aTWTestResponse testResults.
 	
-	onUpdateBlock ifNotNil: [ UIManager default defer: onUpdateBlock ]
+	onUpdateBlock ifNotNil: [ onUpdateBlock cull: aTWTestResponse ]
 ]
 
 { #category : #changes }
